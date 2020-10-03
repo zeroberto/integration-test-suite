@@ -11,6 +11,12 @@ Import this project into your go project using the following statement:
 import "github.com/zeroberto/integration-test-suite"
 ```
 
+Run the command below to download the lib:
+
+```bash
+go get github.com/zeroberto/integration-test-suite
+```
+
 ## Usage
 Create a docker-compose file containing your infrastructure services:
 
@@ -43,53 +49,55 @@ Get your infrastructure up before running your tests. At the end of the tests, y
 ```go
 // Example of test file
 import (
-	"os"
-	"testing"
-    "time"
+  "os"
+  "testing"
+  "time"
+
+  infra "github.com/zeroberto/integration-test-suite"
 )
 
 const (
-	host                  string = "localhost"
-	serverPort            string = "7777"
-	dbType                string = "postgres"
-	dataSourceName        string = "postgres://test:test@localhost:65432/test?sslmode=disable"
-	dockerComposeFileName string = "docker-compose.yml"
+  host                  string = "localhost"
+  serverPort            string = "7777"
+  dbType                string = "postgres"
+  dataSourceName        string = "postgres://test:test@localhost:65432/test?sslmode=disable"
+  dockerComposeFileName string = "docker-compose.yml"
 )
 
 func TestFindUserInfo(t *testing.T) {
-    // Your test code
+  // Your test code
 }
 
 func TestMain(m *testing.M) {
-	setup()
-	code := m.Run()
-	teardown()
-	os.Exit(code)
+  setup()
+  code := m.Run()
+  teardown()
+  os.Exit(code)
 }
 
 func setup() {
-	infra.DownInfra(dockerComposeFileName)
-	infra.UpInfra(dockerComposeFileName)
-	go initServer()
-	validateStructure(dockerComposeFileName)
+  infra.DownInfra(dockerComposeFileName)
+  infra.UpInfra(dockerComposeFileName)
+  go initServer()
+  validateStructure(dockerComposeFileName)
 }
 
 func teardown() {
-	infra.DownInfra(dockerComposeFileName)
+  infra.DownInfra(dockerComposeFileName)
 }
 
 func initServer() {
-	// Start your server in a personalized way
+  // Start your server in a personalized way
 }
 
 func validateStructure(dockerComposeFileName string) {
-    // Validate that all the conditions of your infra are ok. This is just an example.
-	for {
-		if infra.CheckPortIsOpen(host, serverPort) && infra.CheckDBConnection(dbType, dataSourceName) == nil {
-			return
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
+  // Validate that all the conditions of your infra are ok. This is just an example.
+  for {
+    if infra.CheckPortIsOpen(host, serverPort) && infra.CheckDBConnection(dbType, dataSourceName) == nil {
+      return
+    }
+    time.Sleep(100 * time.Millisecond)
+  }
 }
 ```
 
