@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"database/sql"
 	"net"
 	"os/exec"
@@ -8,6 +9,9 @@ import (
 	"time"
 
 	_ "github.com/lib/pq" // Required database driver
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // DownInfra is responsible for bringing down the infrastructure
@@ -55,6 +59,24 @@ func CheckDBConnection(dbType string, dsn string) error {
 		}
 	}
 	return err
+}
+
+// CheckMongoDBConnection is responsible for checking whether mongo database is accepting connections
+func CheckMongoDBConnection(dsn string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 9*time.Second)
+	defer cancel()
+
+	mClient, err := mongo.Connect(ctx, options.Client().ApplyURI(dsn))
+	if err != nil {
+		return err
+	}
+	defer mClient.Disconnect(ctx)
+
+	err = mClient.Ping(ctx, nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // CheckPortIsOpen is responsible for checking that a port is open for connections
