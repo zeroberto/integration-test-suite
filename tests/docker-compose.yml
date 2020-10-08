@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  test:
+    image: alpine
+    environment: 
+      TEST:
+    entrypoint: ["sleep", "infinity"]

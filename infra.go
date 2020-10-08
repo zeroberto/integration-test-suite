@@ -30,6 +30,31 @@ func UpInfra(dockerComposeFileName string) {
 	}
 }
 
+// UpInfraWithEnvs is responsible for raising the infrastructure with environments
+func UpInfraWithEnvs(dockerComposeFileName string, envs map[string]string) {
+	var envStr string
+	for key, value := range envs {
+		envStr += key + "=" + value + " "
+	}
+
+	command := envStr + "docker-compose -f " + dockerComposeFileName + " up -d"
+
+	cmd := exec.Command("bash", "-c", command)
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
+}
+
+// GetContainerEnvValue is responsible for returning a value of env in docker container
+func GetContainerEnvValue(serviceID string, env string) string {
+	out, err := exec.Command("docker", "exec", serviceID, "printenv", env).Output()
+	if err != nil {
+		panic(err)
+	}
+
+	return strings.TrimSuffix(string(out), "\n")
+}
+
 // GetServiceID is responsible for returning a docker service identifier
 func GetServiceID(dockerComposeFileName string, serviceName string) string {
 	out, err := exec.Command("docker-compose", "-f", dockerComposeFileName, "ps", "-q", serviceName).Output()
