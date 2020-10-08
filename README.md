@@ -101,6 +101,9 @@ func validateStructure(dockerComposeFileName string) {
 }
 ```
 
+## Limitations
+Some features are only available for Unix-based systems, such as the `infra.UpInfraWithEnvs()`.
+
 ## License
 
 [MIT](LICENSE) License
